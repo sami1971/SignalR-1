@@ -15,6 +15,7 @@ import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -42,8 +43,8 @@ public class HubConnection {
     private HttpClient httpClient;
     private String stopError;
     private Timer pingTimer = null;
-    private long nextServerTimeout = 0;
-    private long nextPingActivation = 0;
+    private AtomicLong nextServerTimeout = new AtomicLong();
+    private AtomicLong nextPingActivation = new AtomicLong();
     private Duration keepAliveInterval = Duration.ofSeconds(15);
     private Duration serverTimeout = Duration.ofSeconds(30);
     private long tickRate = 1000;
@@ -260,12 +261,12 @@ public class HubConnection {
                                 @Override
                                 public void run() {
                                     try {
-                                        if (System.currentTimeMillis() > nextServerTimeout) {
+                                        if (System.currentTimeMillis() > nextServerTimeout.get()) {
                                             stop("Server timeout elapsed without receiving a message from the server.");
                                             return;
                                         }
 
-                                        if (System.currentTimeMillis() > nextPingActivation) {
+                                        if (System.currentTimeMillis() > nextPingActivation.get()) {
                                             sendHubMessage(PingMessage.getInstance());
                                         }
                                     } catch (Exception e) {
@@ -443,11 +444,11 @@ public class HubConnection {
     }
 
     private void resetServerTimeout() {
-        this.nextServerTimeout = System.currentTimeMillis() + serverTimeout.toMillis();
+        this.nextServerTimeout.set(System.currentTimeMillis() + serverTimeout.toMillis());
     }
 
     private void resetKeepAlive() {
-        this.nextPingActivation = System.currentTimeMillis() + keepAliveInterval.toMillis();
+        this.nextPingActivation.set(System.currentTimeMillis() + keepAliveInterval.toMillis());
     }
 
     /**
