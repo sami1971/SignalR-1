@@ -3,6 +3,7 @@
 
 package com.microsoft.signalr;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -13,6 +14,7 @@ public class HttpHubConnectionBuilder {
     private HttpClient httpClient;
     private boolean skipNegotiate;
     private Supplier<CompletableFuture<String>> accessTokenProvider;
+    private Duration handshakeResponseTimeout;
 
     HttpHubConnectionBuilder(String url) {
         this.url = url;
@@ -54,7 +56,12 @@ public class HttpHubConnectionBuilder {
         return this;
     }
 
+    HttpHubConnectionBuilder withHandshakeResposeTimeout(Duration timeout) {
+        this.handshakeResponseTimeout = timeout;
+        return this;
+    }
+
     public HubConnection build() {
-        return new HubConnection(url, transport, skipNegotiate, logger, httpClient, accessTokenProvider);
+        return new HubConnection(url, transport, skipNegotiate, logger, httpClient, accessTokenProvider, handshakeResponseTimeout);
     }
 }
