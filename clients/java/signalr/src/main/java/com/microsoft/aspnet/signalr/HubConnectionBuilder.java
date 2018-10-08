@@ -48,7 +48,7 @@ public class HubConnectionBuilder {
         return this;
     }
 
-    public HubConnectionBuilder withHeaders(Map<String, String> headers){
+    public HubConnectionBuilder withHeaders(Map<String, String> headers) {
         this.headers = headers;
         return this;
     }
@@ -69,7 +69,7 @@ public class HubConnectionBuilder {
         if (options.getLogger() == null && this.logger != null) {
             options.setLogger(this.logger);
         }
-        if(options.getHeaders() == null && this.headers != null){
+        if (options.getHeaders() == null && this.headers != null) {
             options.setHeaders(headers);
         }
 
