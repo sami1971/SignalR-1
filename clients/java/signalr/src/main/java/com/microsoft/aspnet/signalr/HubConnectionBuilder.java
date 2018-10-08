@@ -3,11 +3,16 @@
 
 package com.microsoft.aspnet.signalr;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class HubConnectionBuilder {
     private String url;
     private Transport transport;
     private Logger logger;
     private HttpConnectionOptions options = null;
+    private Map<String, String> headers = new HashMap<>();
+
 
     public HubConnectionBuilder withUrl(String url) {
         if (url == null || url.isEmpty()) {
@@ -43,6 +48,11 @@ public class HubConnectionBuilder {
         return this;
     }
 
+    public HubConnectionBuilder withHeaders(Map<String, String> headers){
+        this.headers = headers;
+        return this;
+    }
+
     public HubConnection build() {
         if (this.url == null) {
             throw new RuntimeException("The 'HubConnectionBuilder.withUrl' method must be called before building the connection.");
@@ -58,6 +68,9 @@ public class HubConnectionBuilder {
         }
         if (options.getLogger() == null && this.logger != null) {
             options.setLogger(this.logger);
+        }
+        if(options.getHeaders() == null && this.headers != null){
+            options.setHeaders(headers);
         }
 
         return new HubConnection(url, options);

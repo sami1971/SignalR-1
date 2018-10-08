@@ -68,6 +68,10 @@ public class HubConnection {
             this.transport = options.getTransport();
         }
 
+        if (options.getHeaders() != null) {
+            this.headers = options.getHeaders();
+        }
+
         this.skipNegotiate = options.getSkipNegotiate();
 
         this.callback = (payload) -> {
