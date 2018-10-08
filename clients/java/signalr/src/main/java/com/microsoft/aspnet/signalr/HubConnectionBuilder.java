@@ -53,7 +53,7 @@ public class HubConnectionBuilder {
     }
 
     public HubConnectionBuilder withHeader(String name, String value) {
-        if(headers == null) {
+        if (headers == null) {
             this.headers = new HashMap<>();
         }
         this.headers.put(name, value);
