@@ -31,7 +31,6 @@ public class HttpConnectionOptions {
         this.logger = logger;
     }
 
-
     public Map<String, String> getHeaders() {
         return headers;
     }

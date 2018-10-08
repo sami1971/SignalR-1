@@ -13,7 +13,6 @@ public class HubConnectionBuilder {
     private HttpConnectionOptions options = null;
     private Map<String, String> headers = new HashMap<>();
 
-
     public HubConnectionBuilder withUrl(String url) {
         if (url == null || url.isEmpty()) {
             throw new IllegalArgumentException("A valid url is required.");
