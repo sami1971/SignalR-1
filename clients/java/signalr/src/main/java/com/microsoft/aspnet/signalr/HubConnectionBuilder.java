@@ -11,7 +11,7 @@ public class HubConnectionBuilder {
     private Transport transport;
     private Logger logger;
     private HttpConnectionOptions options = null;
-    private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> headers;
 
     public HubConnectionBuilder withUrl(String url) {
         if (url == null || url.isEmpty()) {
@@ -49,6 +49,14 @@ public class HubConnectionBuilder {
 
     public HubConnectionBuilder withHeaders(Map<String, String> headers) {
         this.headers = headers;
+        return this;
+    }
+
+    public HubConnectionBuilder withHeader(String name, String value) {
+        if(headers == null) {
+            this.headers = new HashMap<>();
+        }
+        this.headers.put(name, value);
         return this;
     }
 

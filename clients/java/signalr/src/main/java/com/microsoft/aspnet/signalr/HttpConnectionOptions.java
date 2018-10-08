@@ -15,7 +15,7 @@ public class HttpConnectionOptions {
     private boolean skipNegotiate;
     private Supplier<CompletableFuture<String>> accessTokenProvider;
     private HttpClient client;
-    private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> headers;
 
     public HttpConnectionOptions() {}
 

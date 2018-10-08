@@ -5,7 +5,9 @@ package com.microsoft.aspnet.signalr;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -1051,6 +1053,64 @@ class HubConnectionTest {
         assertEquals("http://testexample.com/?id=bVOiRPG8-6YiJ6d7ZcTOVQ", transport.getUrl());
         hubConnection.stop();
         assertEquals("Bearer newToken", token.get());
+    }
+
+    @Test
+    public void headersAreSetAndSentThroughOptions() throws Exception {
+        AtomicReference<String> header = new AtomicReference<>();
+        TestHttpClient client = new TestHttpClient()
+                .on("POST", "http://example.com/negotiate",
+                        (req) -> {
+                            header.set(req.getHeaders().get("ExampleHeader"));
+                            return CompletableFuture
+                                    .completedFuture(new HttpResponse(200, "", "{\"connectionId\":\"bVOiRPG8-6YiJ6d7ZcTOVQ\",\""
+                                            + "availableTransports\":[{\"transport\":\"WebSockets\",\"transferFormats\":[\"Text\",\"Binary\"]}]}"));
+                        });
+
+        Map<String, String> headerMap = new HashMap<>();
+        headerMap.put("ExampleHeader", "ExampleValue");
+
+        MockTransport transport = new MockTransport();
+        HttpConnectionOptions options = new HttpConnectionOptions();
+        options.setTransport(transport);
+        options.setHttpClient(client);
+        options.setHeaders(headerMap);
+        HubConnection hubConnection = new HubConnectionBuilder()
+                .withUrl("http://example.com", options)
+                .build();
+
+        hubConnection.start().get(1000, TimeUnit.MILLISECONDS);
+        assertEquals(HubConnectionState.CONNECTED, hubConnection.getConnectionState());
+        hubConnection.stop();
+        assertEquals("ExampleValue", header.get());
+    }
+
+    @Test
+    public void headersAreSetAndSentThroughBuilder() throws Exception {
+        AtomicReference<String> header = new AtomicReference<>();
+        TestHttpClient client = new TestHttpClient()
+                .on("POST", "http://example.com/negotiate",
+                        (req) -> {
+                            header.set(req.getHeaders().get("ExampleHeader"));
+                            return CompletableFuture
+                                    .completedFuture(new HttpResponse(200, "", "{\"connectionId\":\"bVOiRPG8-6YiJ6d7ZcTOVQ\",\""
+                                            + "availableTransports\":[{\"transport\":\"WebSockets\",\"transferFormats\":[\"Text\",\"Binary\"]}]}"));
+                        });
+
+
+        MockTransport transport = new MockTransport();
+        HttpConnectionOptions options = new HttpConnectionOptions();
+        options.setTransport(transport);
+        options.setHttpClient(client);
+        HubConnection hubConnection = new HubConnectionBuilder()
+                .withUrl("http://example.com", options)
+                .withHeader("ExampleHeader", "ExampleValue")
+                .build();
+
+        hubConnection.start().get(1000, TimeUnit.MILLISECONDS);
+        assertEquals(HubConnectionState.CONNECTED, hubConnection.getConnectionState());
+        hubConnection.stop();
+        assertEquals("ExampleValue", header.get());
     }
 
     @Test
