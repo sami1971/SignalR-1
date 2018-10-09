@@ -47,7 +47,6 @@ public class HubConnection {
 
         this.baseUrl = url;
         this.protocol = new JsonHubProtocol();
-        this.handshakeResponseFuture = new CompletableFuture<>();
 
         if (accessTokenProvider != null) {
             this.accessTokenProvider = accessTokenProvider;
@@ -85,7 +84,9 @@ public class HubConnection {
                 if (handshakeResponse.getHandshakeError() != null) {
                     String errorMessage = "Error in handshake " + handshakeResponse.getHandshakeError();
                     logger.log(LogLevel.Error, errorMessage);
-                    throw new RuntimeException(errorMessage);
+                    RuntimeException exception = new RuntimeException(errorMessage);
+                    handshakeResponseFuture.completeExceptionally(exception);
+                    throw exception;
                 }
                 handshakeReceived = true;
                 handshakeResponseFuture.complete(null);
@@ -144,7 +145,7 @@ public class HubConnection {
     private void timeoutHandshakeResponse(long timeout, TimeUnit unit) {
         ScheduledExecutorService scheduledThreadPool = Executors.newSingleThreadScheduledExecutor();
         scheduledThreadPool.schedule(() -> handshakeResponseFuture.completeExceptionally(
-                new TimeoutException("Timed out waiting for the server to respond to the handshake message")), timeout, unit);
+                new TimeoutException("Timed out waiting for the server to respond to the handshake message.")), timeout, unit);
     }
 
     private CompletableFuture<NegotiateResponse> handleNegotiate(String url) {
@@ -200,6 +201,7 @@ public class HubConnection {
             return CompletableFuture.completedFuture(null);
         }
 
+        handshakeResponseFuture = new CompletableFuture<>();
         handshakeReceived = false;
         CompletableFuture<Void> tokenFuture = accessTokenProvider.get()
                 .thenAccept((token) -> {
@@ -332,6 +334,7 @@ public class HubConnection {
             connectionState = null;
             logger.log(LogLevel.Information, "HubConnection stopped.");
             hubConnectionState = HubConnectionState.DISCONNECTED;
+            handshakeResponseFuture.complete(null);
         } finally {
             hubConnectionStateLock.unlock();
         }
