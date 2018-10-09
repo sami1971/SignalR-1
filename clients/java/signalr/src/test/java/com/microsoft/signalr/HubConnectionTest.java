@@ -65,7 +65,7 @@ class HubConnectionTest {
                 .withTransport(mockTransport)
                 .withHttpClient(new TestHttpClient())
                 .shouldSkipNegotiate(true)
-                .withHandshakeResposeTimeout(Duration.ofMillis(100))
+                .withHandshakeResponseTimeout(Duration.ofMillis(100))
                 .build();
         Throwable exception = assertThrows(ExecutionException.class, () -> hubConnection.start().get());
         assertEquals(TimeoutException.class, exception.getCause().getClass());

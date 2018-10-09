@@ -56,7 +56,7 @@ public class HttpHubConnectionBuilder {
         return this;
     }
 
-    HttpHubConnectionBuilder withHandshakeResposeTimeout(Duration timeout) {
+    HttpHubConnectionBuilder withHandshakeResponseTimeout(Duration timeout) {
         this.handshakeResponseTimeout = timeout;
         return this;
     }
