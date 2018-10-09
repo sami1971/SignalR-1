@@ -71,7 +71,7 @@ public class HubConnection {
             this.transport = transport;
         }
 
-        if (handshakeResponseTimeout != null){
+        if (handshakeResponseTimeout != null) {
             this.handshakeResponseTimeout = handshakeResponseTimeout;
         }
 
